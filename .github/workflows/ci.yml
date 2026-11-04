@@ -1,0 +1,231 @@
+---
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+
+  pull_request:
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install lint tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core ansible-lint yamllint
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/ansible.posix.git,2.0.0
+
+      - name: Run yamllint
+        run: yamllint -c .config/yamllint.yml .
+
+      - name: Run ansible-lint
+        run: ansible-lint
+
+  molecule:
+    name: Molecule - Ubuntu 22.04
+    runs-on: ubuntu-22.04
+    needs: lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Molecule
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core molecule
+          pip install "molecule-plugins[docker]"
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/community.library_inventory_filtering.git,1.1.5
+
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/community.docker.git,5.4.0
+
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/ansible.posix.git,2.0.0
+
+      - name: Make role available to Ansible
+        run: |
+          mkdir -p ~/.ansible/roles/halif
+          ln -s "$GITHUB_WORKSPACE" ~/.ansible/roles/halif/greengage
+
+      - name: Show Molecule version
+        run: molecule --version
+
+      - name: Run default Molecule scenario
+        run: molecule test
+
+  cluster-config:
+    name: Molecule - Cluster configuration
+    runs-on: ubuntu-22.04
+    needs: lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Molecule
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core molecule
+          pip install "molecule-plugins[docker]"
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/community.library_inventory_filtering.git,1.1.5
+
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/community.docker.git,5.4.0
+
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/ansible.posix.git,2.0.0
+
+      - name: Make role available to Ansible
+        run: |
+          mkdir -p ~/.ansible/roles/halif
+          ln -s "$GITHUB_WORKSPACE" ~/.ansible/roles/halif/greengage
+
+      - name: Show Molecule version
+        run: molecule --version
+
+      - name: Run cluster configuration scenario
+        run: molecule test --scenario-name cluster_config
+
+  cluster-integration:
+    name: Molecule - Cluster integration preparation
+    runs-on: ubuntu-22.04
+    needs: lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Molecule
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core molecule
+          pip install "molecule-plugins[docker]"
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/community.library_inventory_filtering.git,1.1.5
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/community.docker.git,5.4.0
+          ansible-galaxy collection install \
+            git+https://github.com/ansible-collections/ansible.posix.git,2.0.0
+
+      - name: Make role available to Ansible
+        run: |
+          mkdir -p ~/.ansible/roles/halif
+          ln -s "$GITHUB_WORKSPACE" ~/.ansible/roles/halif/greengage
+
+      - name: Run cluster integration preparation
+        run: molecule test --scenario-name cluster_integration
+
+  cluster-validation:
+    name: Validate cluster parameters
+    runs-on: ubuntu-22.04
+    needs: lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core
+
+      - name: Validate supported configuration
+        run: |
+          ansible-playbook molecule/cluster_validation/validate.yml
+
+      - name: Reject multiple primary segments
+        shell: bash
+        run: |
+          set +e
+          output=$(ansible-playbook molecule/cluster_validation/validate.yml \
+            --extra-vars '{"greengage_segment_count": 2}' 2>&1)
+          result=$?
+          set -e
+
+          echo "$output"
+
+          if [ "$result" -eq 0 ]; then
+            echo "ERROR: two primary segments were unexpectedly accepted"
+            exit 1
+          fi
+
+          if [[ "$output" != *"one primary segment without mirrors"* ]]; then
+            echo "ERROR: Ansible failed for an unexpected reason"
+            exit 1
+          fi
+
+      - name: Reject inventory without master group
+        shell: bash
+        run: |
+          set +e
+          output=$(ansible-playbook molecule/cluster_validation/validate.yml \
+            --extra-vars '{"greengage_test_inventory": false}' \
+            --extra-vars '{"greengage_cluster_enabled": true}' 2>&1)
+          result=$?
+          set -e
+
+          echo "$output"
+
+          if [ "$result" -eq 0 ]; then
+            echo "ERROR: inventory without master group was unexpectedly accepted"
+            exit 1
+          fi
+
+          if [[ "$output" != *"greengage_master"* ]]; then
+            echo "ERROR: Ansible failed for an unexpected reason"
+            exit 1
+          fi
