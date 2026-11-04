@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  role_name: tarantool
+  author: halif
+  namespace: halif
+  description: Install and configure Tarantool on Ubuntu 22.04.
+  license: MIT
+  min_ansible_version: "2.14"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+    - name: EL
+      versions:
+        - "9"
+
+  galaxy_tags:
+    - database
+    - tarantool
+    - nosql
+    - ubuntu
+    - installation
+
+dependencies: []
