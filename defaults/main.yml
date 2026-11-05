@@ -1,5 +1,5 @@
 ---
-tarantool_release: "3.x"
+tarantool_release: "series-3"
 
 tarantool_packages:
   - tarantool
