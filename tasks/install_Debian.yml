@@ -31,13 +31,8 @@
     state: directory
     mode: '0755'
 
+# noqa: command-instead-of-module
 - name: Download Tarantool GPG key (force IPv4 to prevent CI hangs)
   ansible.builtin.command: curl -4 -s -S -L -o /usr/share/keyrings/tarantool.gpg https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/gpgkey
   args:
-    creates: /usr/share/keyrings/tarantool.gpg  # Гарантирует идемпотентность
-
-- name: Add Tarantool APT repository file
-  ansible.builtin.copy:
-    content: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/ubuntu/ {{ ansible_distribution_release }} main\n"
-    dest: /etc/apt/sources.list.d/tarantool.list
-    mode: '0644'
+    creates: /usr/share/keyrings/tarantool.gpg
