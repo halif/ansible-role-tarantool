@@ -4,7 +4,7 @@
   when: ansible_os_family in ['Debian', 'RedHat']
 
 - name: Install Tarantool packages
-  ansible.builtin.package:
+  ansible.builtin.apt:
     name: "{{ tarantool_packages }}"
     state: present
     update_cache: true
