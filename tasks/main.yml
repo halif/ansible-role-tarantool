@@ -8,3 +8,6 @@
     name: "{{ tarantool_packages }}"
     state: present
   notify: Restart tarantool (if needed)
+
+- name: Instance configs
+  ansible.builtin.include_tasks: "instances.yml"

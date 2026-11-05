@@ -1,0 +1,51 @@
+---
+- name: Ensure tarantool system user and group exist
+  ansible.builtin.user:
+    name: tarantool
+    system: yes
+    create_home: no
+    shell: /usr/sbin/nologin
+  # Пользователь обычно создается пакетом, но эта задача гарантирует идемпотентность и безопасность
+
+- name: Ensure Tarantool directories exist with correct permissions
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: tarantool
+    group: tarantool
+    mode: '0755'
+  loop:
+    - /etc/tarantool/instances.available
+    - /etc/tarantool/instances.enabled
+    - /var/lib/tarantool
+    - /var/log/tarantool
+
+- name: Deploy systemd template for Tarantool instances
+  ansible.builtin.template:
+    src: tarantool@.service.j2
+    dest: /etc/systemd/system/tarantool@.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd daemon
+
+- name: Manage instance configuration symlinks (enable/disable)
+  ansible.builtin.file:
+    src: "/etc/tarantool/instances.available/{{ item.name }}.lua"
+    dest: "/etc/tarantool/instances.enabled/{{ item.name }}.lua"
+    state: "{{ 'link' if item.enabled else 'absent' }}"
+    owner: tarantool
+    group: tarantool
+  loop: "{{ tarantool_instances }}"
+  notify: 
+    - Reload systemd daemon
+    - Restart changed tarantool instances
+
+- name: Ensure Tarantool instances are started and enabled
+  ansible.builtin.systemd:
+    name: "tarantool@{{ item.name }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop: "{{ tarantool_instances }}"
+  when: item.enabled | bool

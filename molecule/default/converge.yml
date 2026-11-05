@@ -2,5 +2,9 @@
 - name: Converge
   hosts: instance
   become: true
+  vars:
+    tarantool_instances:
+      - name: "test_instance"
+        enabled: true
   roles:
     - role: tarantool_ce

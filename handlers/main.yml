@@ -1,10 +1,11 @@
 ---
-- name: Add Tarantool YUM repository
-  ansible.builtin.yum_repository:
-    name: tarantool
-    description: Tarantool CE repository
-    baseurl: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/el/$releasever/$basearch/"
-    gpgcheck: yes
-    gpgkey: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/gpgkey"
-    enabled: yes
-    state: present
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Restart changed tarantool instances
+  ansible.builtin.systemd:
+    name: "tarantool@{{ item.name }}"
+    state: restarted
+  loop: "{{ tarantool_instances }}"
+  when: item.enabled | bool

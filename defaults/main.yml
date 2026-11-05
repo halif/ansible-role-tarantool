@@ -1,0 +1,13 @@
+---
+tarantool_release: "3.1"
+
+tarantool_packages:
+  - tarantool
+  - tarantool-dev
+  - tt
+
+tarantool_instances:
+  - name: "router"
+    enabled: true
+  - name: "storage_1"
+    enabled: false

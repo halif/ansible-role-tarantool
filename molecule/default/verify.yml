@@ -26,3 +26,14 @@
           - tt_version.rc == 0
         fail_msg: "tt CLI is not installed or not in PATH"
         success_msg: "tt CLI installed: {{ tt_version.stdout }}"
+
+    - name: Check if systemd instance is active
+      ansible.builtin.systemd:
+        name: tarantool@test_instance
+      register: instance_status
+
+    - name: Assert instance is running
+      ansible.builtin.assert:
+        that:
+          - instance_status.status.ActiveState == "active"
+        fail_msg: "Tarantool instance test_instance is not active"

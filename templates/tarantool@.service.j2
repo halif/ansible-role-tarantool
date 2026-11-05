@@ -1,0 +1,26 @@
+[Unit]
+Description=Tarantool Database Server instance '{{ '%i' }}'
+After=network.target
+
+[Service]
+Type=simple
+User=tarantool
+Group=tarantool
+ExecStart=/usr/bin/tarantool /etc/tarantool/instances.enabled/%i.lua
+ExecStop=/bin/kill -SIGTERM $MAINPID
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65535
+LimitNPROC=65535
+OOMScoreAdjust=-1000
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=tarantool-%i
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/tarantool /var/log/tarantool
+
+[Install]
+WantedBy=multi-user.target
+# WantedBy=tarantool.target
