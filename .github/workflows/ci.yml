@@ -56,6 +56,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible-core molecule molecule-plugins[docker] docker
 
+      - name: Make role available to Ansible
+        run: |
+          mkdir -p ~/.ansible/roles
+          ln -s "$GITHUB_WORKSPACE" ~/.ansible/roles/tarantool
+
       - name: Run Molecule tests
         run: molecule test
         env:

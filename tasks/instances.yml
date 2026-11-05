@@ -35,6 +35,7 @@
     state: "{{ 'link' if item.enabled else 'absent' }}"
     owner: tarantool
     group: tarantool
+    mode: '0644'
   loop: "{{ tarantool_instances }}"
   notify:
     - Reload systemd daemon
