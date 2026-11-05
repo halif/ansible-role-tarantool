@@ -21,4 +21,4 @@
     repo: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
     state: present
     filename: tarantool
-    update_cache: true
+#    update_cache: true
