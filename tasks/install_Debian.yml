@@ -20,4 +20,3 @@
     content: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/ubuntu/ {{ ansible_distribution_release }} main\n"
     dest: /etc/apt/sources.list.d/tarantool.list
     mode: '0644'
-  
