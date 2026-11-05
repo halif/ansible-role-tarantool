@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: instance
+  become: true
+  tasks:
+    - name: Check if tarantool is installed
+      ansible.builtin.command: tarantool --version
+      register: tarantool_version
+      changed_when: false
+
+    - name: Assert tarantool is installed
+      ansible.builtin.assert:
+        that:
+          - tarantool_version.rc == 0
+        fail_msg: "Tarantool is not installed or not in PATH"
+        success_msg: "Tarantool installed: {{ tarantool_version.stdout }}"
+
+    - name: Check if tt CLI is installed
+      ansible.builtin.command: tt --version
+      register: tt_version
+      changed_when: false
+
+    - name: Assert tt is installed
+      ansible.builtin.assert:
+        that:
+          - tt_version.rc == 0
+        fail_msg: "tt CLI is not installed or not in PATH"
+        success_msg: "tt CLI installed: {{ tt_version.stdout }}"

@@ -1,0 +1,6 @@
+---
+- name: Converge
+  hosts: instance
+  become: true
+  roles:
+    - role: tarantool_ce

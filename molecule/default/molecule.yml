@@ -1,0 +1,24 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  - name: instance
+    # Переменная окружения MOLECULE_DISTRO позволяет менять ОС из CI
+    image: ${MOLECULE_DISTRO:-geerlingguy/docker-ubuntu2204-ansible:latest}
+    pre_build_image: true
+    privileged: true
+    # Держим контейнер "живым", чтобы Ansible мог подключиться
+    command: /bin/bash -c "while true; do sleep 3600; done"
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      interpreter_python: auto_silent
+
+verifier:
+  name: ansible
