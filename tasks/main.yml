@@ -1,0 +1,10 @@
+---
+- name: Include OS-specific installation tasks
+  ansible.builtin.include_tasks: "install_{{ ansible_os_family }}.yml"
+  when: ansible_os_family in ['Debian', 'RedHat']
+
+- name: Install Tarantool packages
+  ansible.builtin.package:
+    name: "{{ tarantool_packages }}"
+    state: present
+  notify: Restart tarantool (if needed)

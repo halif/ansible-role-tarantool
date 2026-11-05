@@ -1,0 +1,10 @@
+---
+- name: Add Tarantool YUM repository
+  ansible.builtin.yum_repository:
+    name: tarantool
+    description: Tarantool CE repository
+    baseurl: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/el/$releasever/$basearch/"
+    gpgcheck: yes
+    gpgkey: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/gpgkey"
+    enabled: yes
+    state: present

@@ -1,0 +1,24 @@
+---
+- name: Install prerequisites for APT
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - gnupg2
+      - ca-certificates
+      - curl
+    state: present
+    update_cache: yes
+
+- name: Download Tarantool GPG key
+  ansible.builtin.get_url:
+    url: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/gpgkey"
+    dest: /usr/share/keyrings/tarantool.gpg
+    mode: '0644'
+
+- name: Add Tarantool APT repository
+  ansible.builtin.apt_repository:
+    # ansible_distribution | lower вернет 'ubuntu' или 'debian'
+    repo: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+    state: present
+    filename: tarantool
+    update_cache: yes
