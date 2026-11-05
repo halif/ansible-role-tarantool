@@ -2,7 +2,6 @@
 - name: Update apt cache and install prerequisites
   ansible.builtin.apt:
     name:
-      - apt-transport-https
       - gnupg
       - ca-certificates
       - curl

@@ -13,13 +13,23 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-    command: ""
+    command: "/lib/systemd/systemd"
 
 provisioner:
   name: ansible
   config_options:
     defaults:
       interpreter_python: auto_silent
+  playbooks:
+    test:
+      - dependency
+      - destroy
+      - syntax
+      - create
+      - converge
+      - idempotence
+      - verify
+      - destroy
 
 verifier:
   name: ansible
