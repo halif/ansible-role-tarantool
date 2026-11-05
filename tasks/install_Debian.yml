@@ -7,7 +7,6 @@
       - ca-certificates
       - curl
     state: present
-    update_cache: true
 
 - name: Download Tarantool GPG key
   ansible.builtin.get_url:
@@ -17,8 +16,6 @@
 
 - name: Add Tarantool APT repository
   ansible.builtin.apt_repository:
-    # ansible_distribution | lower вернет 'ubuntu' или 'debian'
-    repo: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+    repo: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
     filename: tarantool
-#    update_cache: true
