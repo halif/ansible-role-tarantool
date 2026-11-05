@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name:
       - apt-transport-https
-      - gnupg2
+      - gnupg
       - ca-certificates
       - curl
     state: present
