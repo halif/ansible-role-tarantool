@@ -1,4 +1,20 @@
 ---
+- name: Clear any existing apt locks (CI safeguard)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /var/lib/apt/lists/lock
+    - /var/cache/apt/archives/lock
+    - /var/lib/dpkg/lock
+    - /var/lib/dpkg/lock-frontend
+
+- name: Force IPv4 for APT to prevent CI hangs
+  ansible.builtin.copy:
+    content: "Acquire::ForceIPv4 \"true\";\n"
+    dest: /etc/apt/apt.conf.d/99force-ipv4
+    mode: '0644'
+
 - name: Update apt cache and install prerequisites
   ansible.builtin.apt:
     name:
@@ -7,6 +23,7 @@
       - curl
     state: present
     update_cache: true
+    force_apt_get: true  # Более предсказуемое поведение в CI, чем aptitude
 
 - name: Download Tarantool GPG key
   ansible.builtin.get_url:
