@@ -1,5 +1,5 @@
 ---
-- name: Install prerequisites for APT
+- name: Update apt cache and install prerequisites
   ansible.builtin.apt:
     name:
       - apt-transport-https
@@ -15,8 +15,9 @@
     dest: /usr/share/keyrings/tarantool.gpg
     mode: '0644'
 
-- name: Add Tarantool APT repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/ubuntu/ {{ ansible_distribution_release }} main"
-    state: present
-    filename: tarantool
+- name: Add Tarantool APT repository file
+  ansible.builtin.copy:
+    content: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/ubuntu/ {{ ansible_distribution_release }} main\n"
+    dest: /etc/apt/sources.list.d/tarantool.list
+    mode: '0644'
+  
