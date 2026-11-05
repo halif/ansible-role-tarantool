@@ -2,10 +2,9 @@
 - name: Ensure tarantool system user and group exist
   ansible.builtin.user:
     name: tarantool
-    system: yes
-    create_home: no
+    system: true
+    create_home: false
     shell: /usr/sbin/nologin
-  # Пользователь обычно создается пакетом, но эта задача гарантирует идемпотентность и безопасность
 
 - name: Ensure Tarantool directories exist with correct permissions
   ansible.builtin.file:
@@ -37,7 +36,7 @@
     owner: tarantool
     group: tarantool
   loop: "{{ tarantool_instances }}"
-  notify: 
+  notify:
     - Reload systemd daemon
     - Restart changed tarantool instances
 
@@ -45,7 +44,7 @@
   ansible.builtin.systemd:
     name: "tarantool@{{ item.name }}"
     state: started
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
   loop: "{{ tarantool_instances }}"
   when: item.enabled | bool

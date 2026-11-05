@@ -4,7 +4,7 @@
     name: tarantool
     description: Tarantool CE repository
     baseurl: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/el/$releasever/$basearch/"
-    gpgcheck: yes
+    gpgcheck: true
     gpgkey: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/gpgkey"
-    enabled: yes
+    enabled: true
     state: present
