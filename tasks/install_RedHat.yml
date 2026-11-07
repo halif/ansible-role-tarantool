@@ -39,19 +39,8 @@
         touch /var/lib/tarantool-role/repository-configured
     creates: /var/lib/tarantool-role/repository-configured
 
-- name: Add Tarantool modules repository
-  ansible.builtin.yum_repository:
-    name: tarantool-modules
-    description: Tarantool modules repository
-    baseurl: "https://download.tarantool.org/tarantool/modules/el/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgkey: https://download.tarantool.org/tarantool/modules/gpgkey
-    repo_gpgcheck: true
-    gpgcheck: false
-    enabled: true
-    state: present
-
 - name: Install Tarantool packages
   ansible.builtin.dnf:
-    name: "{{ tarantool_packages }}"
+    name: "{{ tarantool_packages_redhat }}"
     state: present
     update_cache: true

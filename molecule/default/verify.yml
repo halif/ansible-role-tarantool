@@ -23,6 +23,7 @@
         cmd: tt version
       register: tt_version
       changed_when: false
+      when: ansible_os_family == "Debian"
 
     - name: Assert tt CLI is installed
       ansible.builtin.assert:
@@ -30,6 +31,7 @@
           - tt_version.rc == 0
         fail_msg: "tt CLI is not installed"
         success_msg: "tt CLI is installed"
+      when: ansible_os_family == "Debian"
 
     - name: Check generated YAML configuration
       ansible.builtin.stat:
@@ -41,6 +43,7 @@
         that:
           - instance_config.stat.exists
           - instance_config.stat.isreg
+        fail_msg: "Tarantool YAML configuration does not exist"
 
     - name: Check enabled configuration symlink
       ansible.builtin.stat:
@@ -51,6 +54,8 @@
       ansible.builtin.assert:
         that:
           - instance_link.stat.exists
+          - instance_link.stat.islnk
+        fail_msg: "Tarantool instance configuration symlink does not exist"
 
     - name: Check systemd instance status
       ansible.builtin.command:
@@ -61,6 +66,7 @@
     - name: Assert instance is running
       ansible.builtin.assert:
         that:
+          - instance_status.rc == 0
           - instance_status.stdout == "active"
         fail_msg: "Tarantool instance test_instance is not active"
-        success_msg: "Tarantool instance is running"
+        success_msg: "Tarantool instance is running"</

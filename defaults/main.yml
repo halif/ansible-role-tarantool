@@ -5,6 +5,9 @@ tarantool_packages:
   - tarantool
   - tt
 
+tarantool_packages_redhat:
+  - tarantool
+
 tarantool_instances:
   - name: router
     enabled: true
