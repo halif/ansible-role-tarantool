@@ -63,7 +63,7 @@ jobs:
             distro_image: geerlingguy/docker-ubuntu2204-ansible:latest
 
           - distro_name: AlmaLinux 9
-            distro_image: geerlingguy/docker-almalinux9-ansible:latest
+            distro_image: jomrr/molecule-almalinux:9
 
     steps:
       - name: Checkout
