@@ -1,12 +1,12 @@
 # Ansible Role: Tarantool
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/actions/workflows/ci.yml)
+[![CI](https://github.com/halif/ansible-role-tarantool/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/actions/workflows/ci.yml)
 [![Ansible Galaxy](https://img.shields.io/badge/Ansible%20Galaxy-Tarantool-blue?logo=ansible)](https://galaxy.ansible.com/)
-[![Galaxy Downloads](https://img.shields.io/ansible/role/d/YOUR_GALAXY_NAMESPACE/tarantool?label=Galaxy%20downloads)](https://galaxy.ansible.com/ui/standalone/roles/YOUR_GALAXY_NAMESPACE/tarantool/)
-[![Galaxy Quality](https://img.shields.io/ansible/quality/YOUR_GALAXY_NAMESPACE/tarantool)](https://galaxy.ansible.com/ui/standalone/roles/YOUR_GALAXY_NAMESPACE/tarantool/)
-[![GitHub Release](https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/ansible-role-tarantool?display_name=tag)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/releases)
-[![GitHub Issues](https://img.shields.io/github/issues/YOUR_GITHUB_USERNAME/ansible-role-tarantool)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/issues)
-[![GitHub Stars](https://img.shields.io/github/stars/YOUR_GITHUB_USERNAME/ansible-role-tarantool)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/stargazers)
+[![Galaxy Downloads](https://img.shields.io/ansible/role/d/halif/tarantool?label=Galaxy%20downloads)](https://galaxy.ansible.com/ui/standalone/roles/YOUR_GALAXY_NAMESPACE/tarantool/)
+[![Galaxy Quality](https://img.shields.io/ansible/quality/halif/tarantool)](https://galaxy.ansible.com/ui/standalone/roles/YOUR_GALAXY_NAMESPACE/tarantool/)
+[![GitHub Release](https://img.shields.io/github/v/release/halif/ansible-role-tarantool?display_name=tag)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/releases)
+[![GitHub Issues](https://img.shields.io/github/issues/halif/ansible-role-tarantool)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/halif/ansible-role-tarantool)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Ansible](https://img.shields.io/badge/Ansible-2.15%2B-black?logo=ansible)](https://docs.ansible.com/)
 [![Tarantool](https://img.shields.io/badge/Tarantool-3.x-blue)](https://www.tarantool.io/)
