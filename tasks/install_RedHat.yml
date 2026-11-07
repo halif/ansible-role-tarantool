@@ -8,7 +8,6 @@
   ansible.builtin.dnf:
     name:
       - ca-certificates
-      - curl
     state: present
     update_cache: true
 
