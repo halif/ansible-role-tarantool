@@ -68,5 +68,5 @@
         that:
           - instance_status.rc == 0
           - instance_status.stdout == "active"
-        fail_msg: "Tarantool instance test_instance is not active"
-        success_msg: "Tarantool instance is running"</
+        fail_msg: 'Tarantool instance test_instance is not active'
+        success_msg: 'Tarantool instance is running'
