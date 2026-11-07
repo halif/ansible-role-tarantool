@@ -94,4 +94,4 @@ jobs:
       - name: Run Molecule tests
         run: molecule test
         env:
-          MOLECULE_DISTRO: ${{ matrix.distro_image }}
+          MOLECULE_DISTRO: geerlingguy/docker-ubuntu2204-ansible:latest molecule test

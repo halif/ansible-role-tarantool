@@ -1,26 +1,35 @@
 [Unit]
-Description=Tarantool Database Server instance '{{ '%i' }}'
-After=network.target
+Description=Tarantool 3 instance %i
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
+
 User=tarantool
 Group=tarantool
-ExecStart=/usr/bin/tarantool /etc/tarantool/instances.enabled/%i.lua
-ExecStop=/bin/kill -SIGTERM $MAINPID
+
+WorkingDirectory=/var/lib/tarantool/%i
+
+ExecStart=/usr/bin/tarantool --name %i --config /etc/tarantool/instances.enabled/%i.yaml
+
 Restart=on-failure
 RestartSec=5
+
 LimitNOFILE=65535
 LimitNPROC=65535
-OOMScoreAdjust=-1000
+
+UMask=0027
+
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=tarantool-%i
-NoNewPrivileges=yes
+
+NoNewPrivileges=true
 ProtectSystem=strict
-ProtectHome=yes
-ReadWritePaths=/var/lib/tarantool /var/log/tarantool
+ProtectHome=true
+
+ReadWritePaths=/var/lib/tarantool
 
 [Install]
 WantedBy=multi-user.target
-# WantedBy=tarantool.target

@@ -1,4 +1,14 @@
 ---
+- name: Validate instance names
+  ansible.builtin.assert:
+    that:
+      - item.name is match('^[A-Za-z0-9_-]+$')
+      - item.enabled is defined
+      - (item.port | default(3301) | int) > 0
+      - (item.port | default(3301) | int) < 65536
+    fail_msg: "Invalid Tarantool instance configuration: {{ item }}"
+  loop: "{{ tarantool_instances }}"
+
 - name: Ensure tarantool system user and group exist
   ansible.builtin.user:
     name: tarantool
@@ -6,18 +16,45 @@
     create_home: false
     shell: /usr/sbin/nologin
 
-- name: Ensure Tarantool directories exist with correct permissions
+- name: Ensure Tarantool configuration directories exist
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: tarantool
+    mode: "{{ item.mode }}"
+  loop:
+    - path: /etc/tarantool
+      owner: root
+      mode: '0755'
+    - path: /etc/tarantool/instances.available
+      owner: root
+      mode: '0750'
+    - path: /etc/tarantool/instances.enabled
+      owner: root
+      mode: '0750'
+    - path: /var/lib/tarantool
+      owner: root
+      mode: '0750'
+
+- name: Ensure instance storage directories exist
+  ansible.builtin.file:
+    path: "/var/lib/tarantool/{{ item.0.name }}/{{ item.1 }}"
     state: directory
     owner: tarantool
     group: tarantool
-    mode: '0755'
-  loop:
-    - /etc/tarantool/instances.available
-    - /etc/tarantool/instances.enabled
-    - /var/lib/tarantool
-    - /var/log/tarantool
+    mode: '0750'
+  loop: "{{ tarantool_instances | product(['snapshots', 'wals', 'vinyl']) | list }}"
+
+- name: Generate Tarantool YAML configuration
+  ansible.builtin.template:
+    src: instance.yaml.j2
+    dest: "/etc/tarantool/instances.available/{{ item.name }}.yaml"
+    owner: root
+    group: tarantool
+    mode: '0640'
+  loop: "{{ tarantool_instances }}"
+  notify: Restart changed tarantool instances
 
 - name: Deploy systemd template for Tarantool instances
   ansible.builtin.template:
@@ -28,20 +65,18 @@
     mode: '0644'
   notify: Reload systemd daemon
 
-- name: Manage instance configuration symlinks (enable/disable)
+- name: Manage instance configuration symlinks
   ansible.builtin.file:
-    src: "/etc/tarantool/instances.available/{{ item.name }}.lua"
-    dest: "/etc/tarantool/instances.enabled/{{ item.name }}.lua"
-    state: "{{ 'link' if item.enabled else 'absent' }}"
-    owner: tarantool
+    src: "/etc/tarantool/instances.available/{{ item.name }}.yaml"
+    dest: "/etc/tarantool/instances.enabled/{{ item.name }}.yaml"
+    state: "{{ 'link' if item.enabled | bool else 'absent' }}"
+    owner: root
     group: tarantool
-    mode: '0644'
+    mode: '0640'
   loop: "{{ tarantool_instances }}"
-  notify:
-    - Reload systemd daemon
-    - Restart changed tarantool instances
+  notify: Restart changed tarantool instances
 
-- name: Ensure Tarantool instances are started and enabled
+- name: Ensure enabled Tarantool instances are started
   ansible.builtin.systemd:
     name: "tarantool@{{ item.name }}"
     state: started
@@ -49,3 +84,12 @@
     daemon_reload: true
   loop: "{{ tarantool_instances }}"
   when: item.enabled | bool
+
+- name: Ensure disabled Tarantool instances are stopped
+  ansible.builtin.systemd:
+    name: "tarantool@{{ item.name }}"
+    state: stopped
+    enabled: false
+    daemon_reload: true
+  loop: "{{ tarantool_instances }}"
+  when: not (item.enabled | bool)

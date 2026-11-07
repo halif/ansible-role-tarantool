@@ -1,0 +1,9 @@
+-- Managed by Ansible. Do not edit manually.
+
+box.cfg {
+    listen = {{ item.listen | default(3301) }},
+    memtx_dir = "/var/lib/tarantool/{{ item.name }}",
+    wal_dir = "/var/lib/tarantool/{{ item.name }}",
+    vinyl_dir = "/var/lib/tarantool/{{ item.name }}",
+    log = "/var/log/tarantool/{{ item.name }}.log"
+}

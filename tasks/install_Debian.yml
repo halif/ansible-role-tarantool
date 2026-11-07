@@ -1,50 +1,72 @@
 ---
-- name: Clear any existing apt locks (CI safeguard)
+- name: Remove obsolete Tarantool repository
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: /etc/apt/sources.list.d/tarantool.list
     state: absent
-  loop:
-    - /var/lib/apt/lists/lock
-    - /var/cache/apt/archives/lock
-    - /var/lib/dpkg/lock
-    - /var/lib/dpkg/lock-frontend
 
-- name: Force IPv4 for APT to prevent CI hangs
-  ansible.builtin.copy:
-    content: "Acquire::ForceIPv4 \"true\";\n"
-    dest: /etc/apt/apt.conf.d/99force-ipv4
-    mode: '0644'
-
-- name: Force IPv4 system-wide to prevent get_url hangs in CI
-  ansible.builtin.copy:
-    content: "precedence ::ffff:0:0/96  100\n"
-    dest: /etc/gai.conf
-    mode: '0644'
-
-- name: Update apt cache and install prerequisites
+- name: Install APT prerequisites
   ansible.builtin.apt:
     name:
-      - gnupg
       - ca-certificates
       - curl
+      - gnupg
+      - python3-apt
     state: present
     update_cache: true
-    force_apt_get: true
 
-- name: Ensure keyrings directory exists
+- name: Ensure installer directory exists
   ansible.builtin.file:
-    path: /usr/share/keyrings
+    path: /usr/local/libexec
     state: directory
     mode: '0755'
 
-- name: Download Tarantool GPG key
+- name: Ensure repository marker directory exists
+  ansible.builtin.file:
+    path: /var/lib/tarantool-role
+    state: directory
+    mode: '0755'
+
+- name: Download Tarantool 3 installer
   ansible.builtin.get_url:
-    url: "https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/gpgkey"
-    dest: /usr/share/keyrings/tarantool.gpg
+    url: "https://my.tech.vk.com/download/tarantool/{{ tarantool_major_version }}/installer.sh"
+    dest: /usr/local/libexec/tarantool-3-installer.sh
+    mode: '0755'
+
+- name: Configure official Tarantool 3 repository
+  ansible.builtin.command:
+    argv:
+      - bash
+      - -c
+      - >-
+        bash /usr/local/libexec/tarantool-3-installer.sh &&
+        touch /var/lib/tarantool-role/repository-configured
+    creates: /var/lib/tarantool-role/repository-configured
+
+- name: Ensure APT keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Tarantool modules GPG key
+  ansible.builtin.get_url:
+    url: https://download.tarantool.org/tarantool/modules/gpgkey
+    dest: /etc/apt/keyrings/tarantool-modules.asc
     mode: '0644'
 
-- name: Add Tarantool APT repository file
-  ansible.builtin.copy:
-    content: "deb [signed-by=/usr/share/keyrings/tarantool.gpg] https://download.tarantool.org/tarantool/release/{{ tarantool_release }}/ubuntu/ {{ ansible_distribution_release }} main\n"
-    dest: /etc/apt/sources.list.d/tarantool.list
-    mode: '0644'
+- name: Add Tarantool modules APT repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/tarantool-modules.asc]
+      https://download.tarantool.org/tarantool/modules/ubuntu/
+      {{ ansible_distribution_release }} main
+    filename: tarantool-modules
+    state: present
+    update_cache: true
+
+- name: Install Tarantool packages
+  ansible.builtin.apt:
+    name: "{{ tarantool_packages }}"
+    state: present
+    update_cache: true
+    force_apt_get: true

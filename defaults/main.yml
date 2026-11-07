@@ -1,13 +1,15 @@
 ---
-tarantool_release: "series-3"
+tarantool_major_version: "3"
 
 tarantool_packages:
   - tarantool
-  - tarantool-dev
   - tt
 
 tarantool_instances:
-  - name: "router"
+  - name: router
     enabled: true
-  - name: "storage_1"
+    port: 3301
+
+  - name: storage_1
     enabled: false
+    port: 3302
