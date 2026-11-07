@@ -1,0 +1,72 @@
+---
+- name: Remove obsolete Tarantool repository
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/tarantool.list
+    state: absent
+
+- name: Install APT prerequisites
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - python3-apt
+    state: present
+    update_cache: true
+
+- name: Ensure installer directory exists
+  ansible.builtin.file:
+    path: /usr/local/libexec
+    state: directory
+    mode: '0755'
+
+- name: Ensure repository marker directory exists
+  ansible.builtin.file:
+    path: /var/lib/tarantool-role
+    state: directory
+    mode: '0755'
+
+- name: Download Tarantool 3 installer
+  ansible.builtin.get_url:
+    url: "https://my.tech.vk.com/download/tarantool/{{ tarantool_major_version }}/installer.sh"
+    dest: /usr/local/libexec/tarantool-3-installer.sh
+    mode: '0755'
+
+- name: Configure official Tarantool 3 repository
+  ansible.builtin.command:
+    argv:
+      - bash
+      - -c
+      - >-
+        bash /usr/local/libexec/tarantool-3-installer.sh &&
+        touch /var/lib/tarantool-role/repository-configured
+    creates: /var/lib/tarantool-role/repository-configured
+
+- name: Ensure APT keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Tarantool modules GPG key
+  ansible.builtin.get_url:
+    url: https://download.tarantool.org/tarantool/modules/gpgkey
+    dest: /etc/apt/keyrings/tarantool-modules.asc
+    mode: '0644'
+
+- name: Add Tarantool modules APT repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/tarantool-modules.asc]
+      https://download.tarantool.org/tarantool/modules/ubuntu/
+      {{ ansible_distribution_release }} main
+    filename: tarantool-modules
+    state: present
+    update_cache: true
+
+- name: Install Tarantool packages
+  ansible.builtin.apt:
+    name: "{{ tarantool_packages }}"
+    state: present
+    update_cache: true
+    force_apt_get: true

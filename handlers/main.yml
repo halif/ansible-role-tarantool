@@ -1,0 +1,11 @@
+---
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart changed tarantool instances
+  ansible.builtin.systemd:
+    name: "tarantool@{{ item.name }}"
+    state: restarted
+  loop: "{{ tarantool_instances }}"
+  when: item.enabled | bool

@@ -1,0 +1,13 @@
+---
+- name: Converge
+  hosts: instance
+  become: true
+
+  vars:
+    tarantool_instances:
+      - name: test_instance
+        enabled: true
+        port: 3301
+
+  roles:
+    - role: tarantool

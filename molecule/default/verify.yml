@@ -1,0 +1,72 @@
+---
+- name: Verify
+  hosts: instance
+  become: true
+
+  tasks:
+    - name: Check Tarantool version
+      ansible.builtin.command:
+        cmd: tarantool --version
+      register: tarantool_version
+      changed_when: false
+
+    - name: Assert Tarantool 3 is installed
+      ansible.builtin.assert:
+        that:
+          - tarantool_version.rc == 0
+          - tarantool_version.stdout is search('Tarantool 3\.')
+        fail_msg: "Tarantool 3 is not installed"
+        success_msg: "{{ tarantool_version.stdout }}"
+
+    - name: Check tt CLI version
+      ansible.builtin.command:
+        cmd: tt version
+      register: tt_version
+      changed_when: false
+      when: ansible_os_family == "Debian"
+
+    - name: Assert tt CLI is installed
+      ansible.builtin.assert:
+        that:
+          - tt_version.rc == 0
+        fail_msg: "tt CLI is not installed"
+        success_msg: "tt CLI is installed"
+      when: ansible_os_family == "Debian"
+
+    - name: Check generated YAML configuration
+      ansible.builtin.stat:
+        path: /etc/tarantool/instances.available/test_instance.yaml
+      register: instance_config
+
+    - name: Assert configuration exists
+      ansible.builtin.assert:
+        that:
+          - instance_config.stat.exists
+          - instance_config.stat.isreg
+        fail_msg: "Tarantool YAML configuration does not exist"
+
+    - name: Check enabled configuration symlink
+      ansible.builtin.stat:
+        path: /etc/tarantool/instances.enabled/test_instance.yaml
+      register: instance_link
+
+    - name: Assert configuration symlink exists
+      ansible.builtin.assert:
+        that:
+          - instance_link.stat.exists
+          - instance_link.stat.islnk
+        fail_msg: "Tarantool instance configuration symlink does not exist"
+
+    - name: Check systemd instance status
+      ansible.builtin.command:
+        cmd: systemctl is-active tarantool@test_instance
+      register: instance_status
+      changed_when: false
+
+    - name: Assert instance is running
+      ansible.builtin.assert:
+        that:
+          - instance_status.rc == 0
+          - instance_status.stdout == "active"
+        fail_msg: 'Tarantool instance test_instance is not active'
+        success_msg: 'Tarantool instance is running'

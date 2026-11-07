@@ -1,0 +1,46 @@
+---
+- name: Remove obsolete Tarantool repository
+  ansible.builtin.file:
+    path: /etc/yum.repos.d/tarantool.repo
+    state: absent
+
+- name: Install repository prerequisites
+  ansible.builtin.dnf:
+    name:
+      - ca-certificates
+    state: present
+    update_cache: true
+
+- name: Ensure installer directory exists
+  ansible.builtin.file:
+    path: /usr/local/libexec
+    state: directory
+    mode: '0755'
+
+- name: Ensure repository marker directory exists
+  ansible.builtin.file:
+    path: /var/lib/tarantool-role
+    state: directory
+    mode: '0755'
+
+- name: Download Tarantool 3 installer
+  ansible.builtin.get_url:
+    url: "https://my.tech.vk.com/download/tarantool/{{ tarantool_major_version }}/installer.sh"
+    dest: /usr/local/libexec/tarantool-3-installer.sh
+    mode: '0755'
+
+- name: Configure official Tarantool 3 repository
+  ansible.builtin.command:
+    argv:
+      - bash
+      - -c
+      - >-
+        bash /usr/local/libexec/tarantool-3-installer.sh &&
+        touch /var/lib/tarantool-role/repository-configured
+    creates: /var/lib/tarantool-role/repository-configured
+
+- name: Install Tarantool packages
+  ansible.builtin.dnf:
+    name: "{{ tarantool_packages_redhat }}"
+    state: present
+    update_cache: true

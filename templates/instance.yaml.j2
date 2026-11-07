@@ -1,0 +1,18 @@
+groups:
+  default:
+    replicasets:
+      {{ item.name }}:
+        instances:
+          {{ item.name }}:
+            iproto:
+              listen:
+                - uri: "127.0.0.1:{{ item.port | default(3301) }}"
+
+            snapshot:
+              dir: "/var/lib/tarantool/{{ item.name }}/snapshots"
+
+            wal:
+              dir: "/var/lib/tarantool/{{ item.name }}/wals"
+
+            vinyl:
+              dir: "/var/lib/tarantool/{{ item.name }}/vinyl"
