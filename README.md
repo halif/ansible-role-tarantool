@@ -1,7 +1,19 @@
 # Ansible Role: Tarantool
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/actions/workflows/ci.yml)
-[![Ansible Galaxy](https://img.shields.io/badge/Ansible%20Galaxy-Tarantool-blue)](https://galaxy.ansible.com/)
+[![CI](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/actions/workflows/ci.yml)
+[![Ansible Galaxy](https://img.shields.io/badge/Ansible%20Galaxy-Tarantool-blue?logo=ansible)](https://galaxy.ansible.com/)
+[![Galaxy Downloads](https://img.shields.io/ansible/role/d/YOUR_GALAXY_NAMESPACE/tarantool?label=Galaxy%20downloads)](https://galaxy.ansible.com/ui/standalone/roles/YOUR_GALAXY_NAMESPACE/tarantool/)
+[![Galaxy Quality](https://img.shields.io/ansible/quality/YOUR_GALAXY_NAMESPACE/tarantool)](https://galaxy.ansible.com/ui/standalone/roles/YOUR_GALAXY_NAMESPACE/tarantool/)
+[![GitHub Release](https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/ansible-role-tarantool?display_name=tag)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/releases)
+[![GitHub Issues](https://img.shields.io/github/issues/YOUR_GITHUB_USERNAME/ansible-role-tarantool)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/YOUR_GITHUB_USERNAME/ansible-role-tarantool)](https://github.com/YOUR_GITHUB_USERNAME/ansible-role-tarantool/stargazers)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Ansible](https://img.shields.io/badge/Ansible-2.15%2B-black?logo=ansible)](https://docs.ansible.com/)
+[![Tarantool](https://img.shields.io/badge/Tarantool-3.x-blue)](https://www.tarantool.io/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-E95420?logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![AlmaLinux](https://img.shields.io/badge/AlmaLinux-9-0F4266?logo=almalinux&logoColor=white)](https://almalinux.org/)
+[![YAML](https://img.shields.io/badge/Config-YAML-CB171E?logo=yaml)](https://yaml.org/)
+[![Systemd](https://img.shields.io/badge/Service-systemd-555555?logo=linux)](https://systemd.io/)
 
 Ansible role for installing and configuring **Tarantool 3.x** on Debian-based and RedHat-based Linux systems.
 
