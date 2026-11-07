@@ -13,13 +13,15 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-    command: "/lib/systemd/systemd"
+    # Убрали command: "/lib/systemd/systemd".
+    # Образ Geerlingguy сам знает, как оставаться активным для Ansible.
 
 provisioner:
   name: ansible
   config_options:
     defaults:
       interpreter_python: auto_silent
+  # Явная последовательность убирает варнинги о missing playbooks
   playbooks:
     test:
       - dependency
