@@ -1,37 +1,42 @@
 ---
 dependency:
   name: galaxy
+  options:
+    requirements-file: requirements.yml
 
 driver:
   name: docker
 
 platforms:
   - name: instance
-    image: ${MOLECULE_DISTRO:-geerlingguy/docker-ubuntu2204-ansible:latest}
+    image: "${MOLECULE_DISTRO:-geerlingguy/docker-ubuntu2204-ansible:latest}"
     pre_build_image: true
     privileged: true
+    command: /sbin/init
+    cgroupns_mode: host
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    # Убрали command: "/lib/systemd/systemd".
-    # Образ Geerlingguy сам знает, как оставаться активным для Ansible.
+    tmpfs:
+      - /run
+      - /tmp
 
 provisioner:
   name: ansible
+
   config_options:
     defaults:
       interpreter_python: auto_silent
-  # Явная последовательность убирает варнинги о missing playbooks
-  playbooks:
-    test:
-      - dependency
-      - destroy
-      - syntax
-      - create
-      - converge
-      - idempotence
-      - verify
-      - destroy
+
+scenario:
+  test_sequence:
+    - dependency
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
 
 verifier:
   name: ansible
