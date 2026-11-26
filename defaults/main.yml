@@ -8,6 +8,8 @@ tarantool_packages:
 tarantool_packages_redhat:
   - tarantool
 
+tarantool_suse_binary_root: /opt/tarantool
+
 tarantool_instances:
   - name: router
     enabled: true
