@@ -4,6 +4,11 @@
   become: true
 
   vars:
+    ansible_python_interpreter: >-
+      {{ '/usr/bin/python3.11'
+         if 'opensuse' in lookup('env', 'MOLECULE_DISTRO')
+         else 'auto_silent' }}
+
     tarantool_instances:
       - name: test_instance
         enabled: true
