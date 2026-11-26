@@ -1,6 +1,14 @@
 ---
-- name: Install packages required for Tarantool installation
-  community.general.zypper:
+- name: Refresh Zypper repositories
+  ansible.builtin.command:
+    argv:
+      - zypper
+      - --non-interactive
+      - refresh
+  changed_when: false
+
+- name: Install packages required for Tarantool
+  ansible.builtin.package:
     name:
       - ca-certificates
       - curl
@@ -10,7 +18,6 @@
       - zip
       - unzip
     state: present
-    update_cache: true
 
 - name: Create directory for Tarantool installer
   ansible.builtin.file:
