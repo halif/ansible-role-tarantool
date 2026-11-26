@@ -23,7 +23,9 @@
 
     - name: Check tt CLI version
       ansible.builtin.command:
-        cmd: tt version
+        argv:
+          - "{{ '/usr/local/bin/tt' if ansible_os_family == 'Suse' else 'tt' }}"
+          - version
       register: tt_version
       changed_when: false
       when: ansible_os_family in ['Debian', 'Suse']
