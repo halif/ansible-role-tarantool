@@ -40,6 +40,8 @@
     argv:
       - /bin/sh
       - /usr/local/src/install-tt.sh
+      - --version
+      - "{{ tarantool_tt_cli_version }}"
       - --dir
       - /usr/local/bin
     creates: /usr/local/bin/tt

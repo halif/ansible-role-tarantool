@@ -10,6 +10,8 @@ tarantool_packages_redhat:
 
 tarantool_suse_binary_root: /opt/tarantool
 
+tarantool_tt_cli_version: "3.0.0-alpha.2"
+
 tarantool_instances:
   - name: router
     enabled: true
