@@ -1,0 +1,16 @@
+---
+- name: Prepare Molecule instance
+  hosts: instance
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Install Python 3.11 on openSUSE Leap
+      ansible.builtin.raw: |
+        if grep -q '^ID=opensuse-leap' /etc/os-release; then
+          if ! test -x /usr/bin/python3.11; then
+            zypper --non-interactive install python311
+          fi
+        fi
+      register: python311_install
+      changed_when: false
