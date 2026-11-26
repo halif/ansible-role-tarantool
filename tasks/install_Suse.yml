@@ -1,0 +1,59 @@
+
+---
+- name: Install packages required for Tarantool installation
+  community.general.zypper:
+    name:
+      - ca-certificates
+      - curl
+      - git
+      - tar
+      - gzip
+      - zip
+      - unzip
+    state: present
+    update_cache: true
+
+- name: Create directory for Tarantool installer
+  ansible.builtin.file:
+    path: /usr/local/src
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download official tt CLI installer
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/tarantool/tt/v3/install.sh
+    dest: /usr/local/src/install-tt.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install tt CLI
+  ansible.builtin.command:
+    argv:
+      - /bin/sh
+      - /usr/local/src/install-tt.sh
+      - --dir
+      - /usr/local/bin
+    creates: /usr/local/bin/tt
+
+- name: Install Tarantool Community Edition
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/tt
+      - binary
+      - install
+      - tarantool
+      - "{{ tarantool_major_version }}"
+      - --scope
+      - system
+    creates: "{{ tarantool_suse_binary_root }}/bin/tarantool"
+  environment:
+    TT_SYSTEM_ROOT: "{{ tarantool_suse_binary_root }}"
+
+- name: Create standard Tarantool binary symlink
+  ansible.builtin.file:
+    src: "{{ tarantool_suse_binary_root }}/bin/tarantool"
+    dest: /usr/bin/tarantool
+    state: link
